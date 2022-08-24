@@ -3,19 +3,19 @@ from abc import ABC, abstractmethod
 
 class Switchable(ABC):
     @abstractmethod
-    def turn_on(self):
+    def turn_on(self) -> None:
         pass
 
     @abstractmethod
-    def turn_off(self):
+    def turn_off(self) -> None:
         pass
 
 
 class LightBulb(Switchable):
-    def turn_on(self):
+    def turn_on(self) -> None:
         print("LightBulb: turned on...")
 
-    def turn_off(self):
+    def turn_off(self) -> None:
         print("LightBulb: turned off...")
 
 
@@ -28,10 +28,9 @@ class Fan(Switchable):
 
 
 class ElectricPowerSwitch:
-
-    def __init__(self, c: Switchable):
-        self.client = c
-        self.on = False
+    def __init__(self, client: Switchable):
+        self.client: Switchable = client
+        self.on: bool = False
 
     def press(self):
         if self.on:
@@ -42,8 +41,8 @@ class ElectricPowerSwitch:
             self.on = True
 
 
-l = LightBulb()
-f = Fan()
-switch = ElectricPowerSwitch(f)
+lightBulb = LightBulb()
+fan = Fan()
+switch = ElectricPowerSwitch(fan)
 switch.press()
 switch.press()
