@@ -1,64 +1,69 @@
-import string
 import random
-from typing import List
+import string
 from abc import ABC, abstractmethod
 
 
-def generate_id(length=8):
+def generate_id(length: int = 8) -> str:
     # helper function for generating an id
-    return ''.join(random.choices(string.ascii_uppercase, k=length))
+    return "".join(random.choices(string.ascii_uppercase, k=length))
 
 
 class SupportTicket:
-
-    def __init__(self, customer, issue):
-        self.id = generate_id()
-        self.customer = customer
-        self.issue = issue
+    def __init__(self, customer: str, issue: str) -> None:
+        self.id: str = generate_id()
+        self.customer: str = customer
+        self.issue: str = issue
 
 
 class TicketOrderingStrategy(ABC):
     @abstractmethod
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
+    def create_ordering(
+            self, to_process_list: list[SupportTicket]
+    ) -> list[SupportTicket]:
         pass
 
 
 class FIFOOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        return list.copy()
+    def create_ordering(
+            self, to_process_list: list[SupportTicket]
+    ) -> list[SupportTicket]:
+        return to_process_list.copy()
 
 
 class FILOOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        list_copy = list.copy()
-        list_copy.reverse()
-        return list_copy
+    def create_ordering(
+            self, to_process_list: list[SupportTicket]
+    ) -> list[SupportTicket]:
+        return list(reversed(to_process_list.copy()))
 
 
 class RandomOrderingStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
-        list_copy = list.copy()
-        random.shuffle(list_copy)
-        return list_copy
+    def create_ordering(
+            self, to_process_list: list[SupportTicket]
+    ) -> list[SupportTicket]:
+        return sorted(to_process_list.copy(), key=lambda x: random.random())
 
 
 class BlackHoleStrategy(TicketOrderingStrategy):
-    def create_ordering(self, list: List[SupportTicket]) -> List[SupportTicket]:
+    def create_ordering(
+            self, to_process_list: list[SupportTicket]
+    ) -> list[SupportTicket]:
         return []
 
 
 class CustomerSupport:
-
     def __init__(self, processing_strategy: TicketOrderingStrategy):
-        self.tickets = []
-        self.processing_strategy = processing_strategy
+        self.tickets: list[SupportTicket] = []
+        self.processing_strategy: TicketOrderingStrategy = processing_strategy
 
-    def create_ticket(self, customer, issue):
+    def create_ticket(self, customer: str, issue: str) -> None:
         self.tickets.append(SupportTicket(customer, issue))
 
-    def process_tickets(self):
+    def process_tickets(self) -> None:
         # create the ordered list
-        ticket_list = self.processing_strategy.create_ordering(self.tickets)
+        ticket_list: list[SupportTicket] = self.processing_strategy.create_ordering(
+            self.tickets
+        )
 
         # if it's empty, don't do anything
         if len(ticket_list) == 0:
@@ -69,7 +74,8 @@ class CustomerSupport:
         for ticket in ticket_list:
             self.process_ticket(ticket)
 
-    def process_ticket(self, ticket: SupportTicket):
+    @staticmethod
+    def process_ticket(ticket: SupportTicket):
         print("==================================")
         print(f"Processing ticket id: {ticket.id}")
         print(f"Customer: {ticket.customer}")
